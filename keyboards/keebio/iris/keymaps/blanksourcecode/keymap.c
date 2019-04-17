@@ -2,6 +2,7 @@
 
 extern keymap_config_t keymap_config;
 
+// Layer defines
 #define _COLEMAKDH 0
 #define _CODING 1
 #define _ARROWS 2
@@ -9,13 +10,35 @@ extern keymap_config_t keymap_config;
 #define _NUMPAD 4
 #define _SPECIAL 5
 #define _GAMING 6
-#define _TEMPLATE 7
+#define _CONTROL 7
+#define _TEMPLATE 8
 
+// Shorthand Macros
 #define _LSB LSFT_T(KC_BSPC)
 #define _LCE LCTL_T(KC_ENT)
 #define _LGZ LGUI_T(KC_Z)
 #define _LAX LALT_T(KC_X)
 
+// Custom keycodes
+enum {
+  SHIFT_TAB = SAFE_RANGE
+};
+
+// Tap-dance defines
+enum {
+  TD_ENT_SPEC = 0,
+  TD_CTRL_LAY = 1,
+  TD_SHFT_BK_LAY = 2,
+  TD_SHFT_DL_LAY = 3
+};
+
+void spec_finished (qk_tap_dance_state_t *state, void *user_data);
+void spec_reset (qk_tap_dance_state_t *state, void *user_data);
+void ctrl_finished (qk_tap_dance_state_t *state, void *user_data);
+void ctrl_reset (qk_tap_dance_state_t *state, void *user_data);
+
+// Tap-dance built-ins
+int cur_dance (qk_tap_dance_state_t *state);
 typedef struct {
   bool is_press_action;
   int state;
@@ -31,14 +54,6 @@ enum {
   TRIPLE_HOLD = 7
 };
 
-enum {
-  TD_ENT_SPEC = 0
-};
-
-int cur_dance (qk_tap_dance_state_t *state);
-void x_finished (qk_tap_dance_state_t *state, void *user_data);
-void x_reset (qk_tap_dance_state_t *state, void *user_data);
-
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_COLEMAKDH] = LAYOUT(
@@ -49,9 +64,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤
       _LSB,    KC_A,    KC_R,    KC_S,    KC_T,    KC_G,                               KC_M,    KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
   //├────────┼────────┼────────┼────────┼────────┼────────┼────────┐        ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-      _LCE,    _LGZ,    _LAX,    KC_C,    KC_D,    KC_V,  TD(TD_ENT_SPEC),    KC_DEL,  KC_K,    KC_H,    KC_COMM, KC_DOT,  KC_SLSH, TO(6),
+TD(TD_CTRL_LAY),_LGZ,   _LAX,    KC_C,    KC_D,    KC_V,  TD(TD_ENT_SPEC),    KC_DEL,  KC_K,    KC_H,    KC_COMM, KC_DOT,  KC_SLSH, TO(6),
   //└────────┴────────┴────────┴───┬────┴───┬────┴───┬────┴───┬────┘        └───┬────┴───┬────┴───┬────┴───┬────┴────────┴────────┴────────┘
-                               LT(4,KC_Y), LT(1,KC_SPC), LSFT_T(KC_DEL),        KC_ENT, LT(2,KC_SPC), LT(1,KC_NO)
+                               LT(4,KC_F11), LT(1,KC_SPC), LSFT_T(KC_DEL),    KC_ENT, LT(2,KC_SPC), LT(1,KC_NO)
                                 // └────────┴────────┴────────┘                 └────────┴────────┴────────┘
   ),
 
@@ -139,6 +154,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                 // └────────┴────────┴────────┘                 └────────┴────────┴────────┘
   ),
 
+  [_CONTROL]= LAYOUT(
+  //┌────────┬────────┬────────┬────────┬────────┬────────┐                          ┌────────┬────────┬────────┬────────┬────────┬────────┐
+      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,                            KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+  //├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤
+    SHIFT_TAB, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,                            KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+  //├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤
+      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,                            KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+  //├────────┼────────┼────────┼────────┼────────┼────────┼────────┐        ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
+      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,          KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+  //└────────┴────────┴────────┴───┬────┴───┬────┴───┬────┴───┬────┘        └───┬────┴───┬────┴───┬────┴───┬────┴────────┴────────┴────────┘
+                                     KC_Y,   KC_TRNS, KC_TRNS,                   KC_TRNS, KC_TRNS, KC_TRNS
+                                // └────────┴────────┴────────┘                 └────────┴────────┴────────┘
+  ),
+
   [_TEMPLATE] = LAYOUT(
   //┌────────┬────────┬────────┬────────┬────────┬────────┐                          ┌────────┬────────┬────────┬────────┬────────┬────────┐
       TO(0),   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,                              KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
@@ -158,26 +187,31 @@ void matrix_init_user(void) {
   rgblight_enable();
 }
 
+
+uint16_t h = 240;
+uint8_t s = 255;
+uint8_t v = 255;
+bool is_in_rgb_mode = false;
+
 void matrix_scan_user(void) {
   #ifdef RGBLIGHT_ENABLE
 
   static uint8_t old_layer = 255;
   uint8_t new_layer = biton32(layer_state);
 
-  static uint16_t h = 240;
-  static uint8_t s = 255;
-  static uint8_t v = 255;
-
   if (old_layer != new_layer) {
-    if (old_layer == _SPECIAL && rgblight_get_mode() != false) {
-      uint16_t newH = rgblight_get_hue();
-      uint8_t newS = rgblight_get_sat();
-      uint8_t newV = rgblight_get_val();
+    if (old_layer == _SPECIAL) {
+      is_in_rgb_mode = false;
+      if (rgblight_get_mode() != false) {
+        uint16_t newH = rgblight_get_hue();
+        uint8_t newS = rgblight_get_sat();
+        uint8_t newV = rgblight_get_val();
 
-      if (newH != 300 || newS != 255 || newV != v) {
-         h = newH;
-         s = newS;
-         v = newV;
+        if (newH != 300 || newS != 255 || newV != v) {
+          h = newH;
+          s = newS;
+          v = newV;
+        }
       }
     }
     switch (new_layer) {
@@ -202,6 +236,9 @@ void matrix_scan_user(void) {
       case _GAMING:
         rgblight_sethsv(120, 85, v);
         break;
+      case _CONTROL:
+        rgblight_sethsv(217, 59, v);
+        break;
     }
 
     old_layer = new_layer;
@@ -210,9 +247,40 @@ void matrix_scan_user(void) {
   #endif //RGBLIGHT_ENABLE
 }
 
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  switch (keycode) {
+    case RGB_HUI:
+    case RGB_HUD:
+    case RGB_SAI:
+    case RGB_SAD:
+    case RGB_VAI:
+    case RGB_VAD: {
+      if (record->event.pressed) {
+        uint8_t new_layer = biton32(layer_state);
+        if (new_layer == _SPECIAL && !is_in_rgb_mode) {
+          is_in_rgb_mode = true;
+          rgblight_sethsv(h, s, v);
+        }
+      }
+      return true;
+    }
+
+    case SHIFT_TAB: {
+      unregister_code(KC_LCTRL);
+      register_code(KC_LSFT);
+      tap_code(KC_TAB);
+      unregister_code(KC_LSFT);
+      return false;
+    }
+
+    default:
+      return true;
+  }
+}
+
 int cur_dance (qk_tap_dance_state_t *state) {
   if (state->count == 1) {
-    if (state->interrupted || !state->pressed)  return SINGLE_TAP;
+    if (!state->pressed)  return SINGLE_TAP;
     else return SINGLE_HOLD;
   }
   else if (state->count == 2) {
@@ -220,22 +288,17 @@ int cur_dance (qk_tap_dance_state_t *state) {
     else if (state->pressed) return DOUBLE_HOLD;
     else return DOUBLE_TAP;
   }
-
-  if (state->count == 3) {
-    if (state->interrupted || !state->pressed)  return TRIPLE_TAP;
-    else return TRIPLE_HOLD;
-  }
   else return 8;
 }
 
-static tap xtap_state = {
+static tap spec_tap_state = {
   .is_press_action = true,
   .state = 0
 };
 
-void x_finished (qk_tap_dance_state_t *state, void *user_data) {
-  xtap_state.state = cur_dance(state);
-  switch (xtap_state.state) {
+void spec_finished (qk_tap_dance_state_t *state, void *user_data) {
+  spec_tap_state.state = cur_dance(state);
+  switch (spec_tap_state.state) {
     case SINGLE_TAP: register_code(KC_ENT); break;
     case SINGLE_HOLD: layer_on(_SPECIAL); break;
     case DOUBLE_TAP: layer_on(_SPECIAL); break;
@@ -244,17 +307,45 @@ void x_finished (qk_tap_dance_state_t *state, void *user_data) {
   }
 }
 
-void x_reset (qk_tap_dance_state_t *state, void *user_data) {
-  switch (xtap_state.state) {
+void spec_reset (qk_tap_dance_state_t *state, void *user_data) {
+  switch (spec_tap_state.state) {
     case SINGLE_TAP: unregister_code(KC_ENT); break;
     case SINGLE_HOLD: layer_off(_SPECIAL); break;
     case DOUBLE_TAP:  break;
     case DOUBLE_HOLD: break;
     case DOUBLE_SINGLE_TAP: break;
   }
-  xtap_state.state = 0;
+  spec_tap_state.state = 0;
+}
+
+static tap ctrl_tap_state = {
+  .is_press_action = true,
+  .state = 0
+};
+
+void ctrl_finished (qk_tap_dance_state_t *state, void *user_data) {
+  ctrl_tap_state.state = cur_dance(state);
+  switch (ctrl_tap_state.state) {
+    case SINGLE_TAP: register_code(KC_F10); break;
+    case SINGLE_HOLD: register_code(KC_LCTL); layer_on(_CONTROL); break;
+    case DOUBLE_TAP: break;
+    case DOUBLE_HOLD: break;
+    case DOUBLE_SINGLE_TAP: break;
+  }
+}
+
+void ctrl_reset (qk_tap_dance_state_t *state, void *user_data) {
+  switch (ctrl_tap_state.state) {
+    case SINGLE_TAP: unregister_code(KC_F10); break;
+    case SINGLE_HOLD: unregister_code(KC_LCTL); layer_off(_CONTROL); break;
+    case DOUBLE_TAP:  break;
+    case DOUBLE_HOLD: break;
+    case DOUBLE_SINGLE_TAP: break;
+  }
+  ctrl_tap_state.state = 0;
 }
 
 qk_tap_dance_action_t tap_dance_actions[] = {
-  [TD_ENT_SPEC] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, x_finished, x_reset)
+  [TD_ENT_SPEC] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, spec_finished, spec_reset),
+  [TD_CTRL_LAY] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, ctrl_finished, ctrl_reset)
 };
