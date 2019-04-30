@@ -36,4 +36,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define RGBLIGHT_VAL_STEP 8
 
 #define TAPPING_TOGGLE 2
-#define TAPPING_TERM 250
+#define TAPPING_TERM 200
