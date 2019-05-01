@@ -139,15 +139,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_GAMING] = LAYOUT(
   //┌────────┬────────┬────────┬────────┬────────┬────────┐                          ┌────────┬────────┬────────┬────────┬────────┬────────┐
-      TO(0),   KC_1,     KC_2,   KC_3,    KC_4,    KC_5,                              KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
+      TO(0),   KC_1,     KC_2,   KC_3,    KC_4,    KC_5,                              KC_TRNS,   KC_TRNS,   KC_TRNS,   KC_TRNS,   KC_TRNS,   KC_TRNS,
   //├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤
-      KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                              KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
+      KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                              KC_TRNS,   KC_TRNS,   KC_TRNS,   KC_TRNS,   KC_TRNS,   KC_TRNS,
   //├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤
-      KC_LSFT, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                              KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
+      KC_LSFT, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                              KC_TRNS,   KC_TRNS,   KC_TRNS,   KC_TRNS,   KC_TRNS,   KC_TRNS,
   //├────────┼────────┼────────┼────────┼────────┼────────┼────────┐        ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-      KC_LCTL, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,   KC_NO,            KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   TO(5),
+      KC_LCTL, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,   KC_NO,            KC_TRNS,   KC_TRNS,   KC_TRNS,   KC_TRNS,   KC_TRNS,   KC_TRNS,   TO(5),
   //└────────┴────────┴────────┴───┬────┴───┬────┴───┬────┴───┬────┘        └───┬────┴───┬────┴───┬────┴───┬────┴────────┴────────┴────────┘
-                                     KC_NO,   KC_SPC,  KC_NO,                     KC_NO,   KC_NO,   KC_NO
+                                     KC_NO,   KC_SPC,  KC_NO,                     KC_TRNS,   KC_TRNS,   KC_TRNS
                                 // └────────┴────────┴────────┘                 └────────┴────────┴────────┘
   ),
 
