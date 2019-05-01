@@ -172,15 +172,14 @@ uint8_t s = 255;
 uint8_t v = 255;
 bool is_in_rgb_mode = false;
 
-void matrix_init_user(void) {
+void eeconfig_init_user(void) {
   rgblight_enable();
+  rgblight_sethsv_noeeprom(h, s, v);
 }
 
-void matrix_scan_user(void) {
-  #ifdef RGBLIGHT_ENABLE
-
+uint32_t layer_state_set_user(uint32_t state) {
   static uint8_t old_layer = 255;
-  uint8_t new_layer = biton32(layer_state);
+  uint8_t new_layer = biton32(state);
 
   if (old_layer != new_layer) {
     if (old_layer == _SPECIAL) {
@@ -197,21 +196,22 @@ void matrix_scan_user(void) {
         }
       }
     }
+
     switch (new_layer) {
       case _COLEMAKDH:
-        rgblight_sethsv(h, s, v);
+        rgblight_sethsv_noeeprom(h, s, v);
         break;
       case _CODING:
-        rgblight_sethsv(0, 255, v);
+        rgblight_sethsv_noeeprom(0, 255, v);
         break;
       case _ARROWS:
-        rgblight_sethsv(120, 255, v);
+        rgblight_sethsv_noeeprom(120, 255, v);
         break;
       case _MOUSE:
-        rgblight_sethsv(180, 255, v);
+        rgblight_sethsv_noeeprom(180, 255, v);
         break;
       case _NUMPAD:
-        rgblight_sethsv(60, 255, v);
+        rgblight_sethsv_noeeprom(60, 255, v);
         // Ensure numlock is on so we can actually use the number keys
         if (!(host_keyboard_leds() & (1<<USB_LED_NUM_LOCK))) {
           register_code(KC_NUMLOCK);
@@ -219,16 +219,17 @@ void matrix_scan_user(void) {
         }
         break;
       case _SPECIAL:
-        rgblight_sethsv(300, 255, v);
+        rgblight_sethsv_noeeprom(300, 255, v);
         break;
       case _GAMING:
-        rgblight_sethsv(120, 85, v);
+        rgblight_sethsv_noeeprom(120, 85, v);
         break;
     }
 
     old_layer = new_layer;
   }
-  #endif //RGBLIGHT_ENABLE
+
+  return state;
 }
 
 bool is_ctrl_tabbing = 0;
@@ -245,7 +246,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         uint8_t new_layer = biton32(layer_state);
         if (new_layer == _SPECIAL && !is_in_rgb_mode) {
           is_in_rgb_mode = true;
-          rgblight_sethsv(h, s, v);
+          rgblight_sethsv_noeeprom(h, s, v);
         }
       }
       return true;
