@@ -8,7 +8,7 @@ extern keymap_config_t keymap_config;
 #define _ARROWS 2
 #define _MOUSE 3
 #define _NUMPAD 4
-#define _SPECIAL 5
+#define _RGB 5
 #define _GAMING 6
 #define _TEMPLATE 7
 
@@ -24,22 +24,24 @@ enum {
   REDO_NUM_F11
 };
 
-// Tap-dance defines
-enum {
-  TD_ENT_SPEC = 0,
-  TD_4_F11_F5,
-};
-
+// Tap-dance built-ins
 void tapdance_oneach (qk_tap_dance_state_t *state, void *user_data);
 void tapdance_onfinished (qk_tap_dance_state_t *state, void *user_data);
 void tapdance_onreset (qk_tap_dance_state_t *state, void *user_data);
 
-// Tap-dance built-ins
 int cur_dance (qk_tap_dance_state_t *state);
 typedef struct {
   bool is_press_action;
   int state;
 } tap;
+
+typedef struct {
+  int single_tap;
+  int single_hold;
+  int double_tap;
+  bool is_double_tap_layer_lock;
+  bool use_instant_layer;
+} tri_layer_action;
 
 enum {
   SINGLE_TAP = 1,
@@ -49,6 +51,31 @@ enum {
   DOUBLE_SINGLE_TAP = 5,
   TRIPLE_TAP = 6,
   TRIPLE_HOLD = 7
+};
+
+// Tap-dance defines
+enum {
+  TD_ENT = 0,
+  TD_NUM,
+  TD_SPC,
+};
+
+static tri_layer_action tri_layer_actions [] = {
+  [TD_ENT] = { .single_tap = KC_ENT, .single_hold = _RGB, .double_tap = _RGB, .is_double_tap_layer_lock = true, .use_instant_layer = false },
+  [TD_NUM] = { .single_tap = KC_F10, .single_hold = _NUMPAD, .double_tap = KC_F5, .is_double_tap_layer_lock = false, .use_instant_layer = true  },
+  [TD_SPC] = { .single_tap = KC_F11, .single_hold = _CODING, .double_tap = KC_SPC, .is_double_tap_layer_lock = false, .use_instant_layer = true  }
+};
+
+static tap tap_states [] = {
+  [TD_ENT] = { .is_press_action = true, .state = 0 },
+  [TD_NUM] = { .is_press_action = true, .state = 0 },
+  [TD_SPC] = { .is_press_action = true, .state = 0 }
+};
+
+qk_tap_dance_action_t tap_dance_actions[] = {
+  [TD_ENT] = { .fn = { tapdance_oneach, tapdance_onfinished, tapdance_onreset }, .user_data = (void*)TD_ENT },
+  [TD_NUM] = { .fn = { tapdance_oneach, tapdance_onfinished, tapdance_onreset }, .user_data = (void*)TD_NUM },
+  [TD_SPC] = { .fn = { tapdance_oneach, tapdance_onfinished, tapdance_onreset }, .user_data = (void*)TD_SPC }
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -61,9 +88,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤
       _LSB,    KC_A,    KC_R,    KC_S,    KC_T,    KC_G,                               KC_M,    KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
   //├────────┼────────┼────────┼────────┼────────┼────────┼────────┐        ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-      _LC1,    _LGZ,   _LAX,    KC_C,    KC_D,    KC_V,  TD(TD_ENT_SPEC),    KC_DEL,  KC_K,    KC_H,    KC_COMM, KC_DOT,  KC_SLSH, TO(6),
+      _LC1,    _LGZ,   _LAX,    KC_C,    KC_D,    KC_V,  TD(TD_ENT),          KC_DEL,  KC_K,    KC_H,    KC_COMM, KC_DOT,  KC_SLSH, TO(6),
   //└────────┴────────┴────────┴───┬────┴───┬────┴───┬────┴───┬────┘        └───┬────┴───┬────┴───┬────┴───┬────┴────────┴────────┴────────┘
-                           TD(TD_4_F11_F5), LT(1,KC_SPC), LSFT_T(KC_DEL),    KC_ENT, LT(2,KC_SPC), LT(1,KC_NO)
+                                TD(TD_NUM), TD(TD_SPC), LSFT_T(KC_DEL),      LT(1,KC_ENT), LT(2,KC_SPC), LT(1,KC_NO)
                                 // └────────┴────────┴────────┘                 └────────┴────────┴────────┘
   ),
 
@@ -75,23 +102,23 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤
      KC_NO,    KC_GRV,  KC_DLR, KC_ASTR,  KC_PMNS, KC_GT,                             KC_AMPR,  KC_LPRN, KC_RPRN, KC_LBRC, KC_RBRC, KC_DQUO,
   //├────────┼────────┼────────┼────────┼────────┼────────┼────────┐        ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-     KC_NO,    KC_NO,   KC_NO,  KC_PERC,  KC_UNDS, KC_LT,   KC_NO,            KC_NO,  KC_EXLM,  KC_EQL,  KC_LT,   KC_GT,   KC_QUES, TO(0),
+     KC_NO,    KC_NO,   KC_NO,  KC_PERC,  KC_UNDS, KC_LT,  KC_TRNS,            KC_NO,  KC_EXLM,  KC_EQL,  KC_LT,   KC_GT,   KC_QUES, TO(0),
   //└────────┴────────┴────────┴───┬────┴───┬────┴───┬────┴───┬────┘        └───┬────┴───┬────┴───┬────┴───┬────┴────────┴────────┴────────┘
-                                     KC_NO,   KC_NO,   KC_NO,                     KC_NO,   KC_NO,   KC_NO
+                                     KC_TRNS, KC_TRNS, KC_TRNS,                     KC_NO,   KC_NO,   KC_NO
                                 // └────────┴────────┴────────┘                 └────────┴────────┴────────┘
   ),
 
   [_ARROWS] = LAYOUT(
   //┌────────┬────────┬────────┬────────┬────────┬────────┐                          ┌────────┬────────┬────────┬────────┬────────┬────────┐
-      TO(0),   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,                              KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
+      TO(0),   KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,                            KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
   //├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤
-      KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,                             KC_NO,LCTL(KC_LEFT),KC_UP,LCTL(KC_RGHT),KC_NO, KC_NO,
+      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,                         KC_TRNS,LCTL(KC_LEFT),KC_UP,LCTL(KC_RGHT),KC_TRNS, KC_TRNS,
   //├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤
-      KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,                              KC_HOME, KC_LEFT, KC_DOWN, KC_RGHT, KC_END,  KC_NO,
+      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,                            KC_HOME, KC_LEFT, KC_DOWN, KC_RGHT, KC_END,  KC_TRNS,
   //├────────┼────────┼────────┼────────┼────────┼────────┼────────┐        ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-      KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,            KC_NO,   KC_NO,LSFT(KC_LEFT),KC_NO,LSFT(KC_RGHT),KC_NO, TO(1),
+      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,        KC_TRNS,KC_TRNS,LSFT(KC_LEFT),KC_TRNS,LSFT(KC_RGHT),KC_TRNS, TO(1),
   //└────────┴────────┴────────┴───┬────┴───┬────┴───┬────┴───┬────┘        └───┬────┴───┬────┴───┬────┴───┬────┴────────┴────────┴────────┘
-                                     KC_NO,   TO(3),   KC_NO,                     KC_NO,   KC_NO,   KC_NO
+                                     KC_TRNS, TO(3),   KC_TRNS,                   KC_TRNS, KC_TRNS, KC_TRNS
                                 // └────────┴────────┴────────┘                 └────────┴────────┴────────┘
   ),
 
@@ -119,11 +146,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //├────────┼────────┼────────┼────────┼────────┼────────┼────────┐        ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
       KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,            KC_NO,   KC_NO,   KC_P1,   KC_P2,   KC_P3,  KC_PEQL,  TO(3),
   //└────────┴────────┴────────┴───┬────┴───┬────┴───┬────┴───┬────┘        └───┬────┴───┬────┴───┬────┴───┬────┴────────┴────────┴────────┘
-                                     KC_NO,   KC_NO,   KC_NO,                     KC_NO,   KC_P0,   KC_PDOT
+                                     KC_TRNS,   KC_NO,   KC_NO,                     KC_NO,   KC_P0,   KC_PDOT
                                 // └────────┴────────┴────────┘                 └────────┴────────┴────────┘
   ),
 
-  [_SPECIAL] = LAYOUT(
+  [_RGB] = LAYOUT(
   //┌────────┬────────┬────────┬────────┬────────┬────────┐                          ┌────────┬────────┬────────┬────────┬────────┬────────┐
       TO(0),   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,                              KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
   //├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤
@@ -182,7 +209,7 @@ uint32_t layer_state_set_user(uint32_t state) {
   uint8_t new_layer = biton32(state);
 
   if (old_layer != new_layer) {
-    if (old_layer == _SPECIAL) {
+    if (old_layer == _RGB) {
       is_in_rgb_mode = false;
       if (rgblight_get_mode() != false) {
         uint16_t newH = rgblight_get_hue();
@@ -218,7 +245,7 @@ uint32_t layer_state_set_user(uint32_t state) {
           unregister_code(KC_NUMLOCK);
         }
         break;
-      case _SPECIAL:
+      case _RGB:
         rgblight_sethsv_noeeprom(300, 255, v);
         break;
       case _GAMING:
@@ -244,7 +271,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case RGB_VAD: {
       if (record->event.pressed) {
         uint8_t new_layer = biton32(layer_state);
-        if (new_layer == _SPECIAL && !is_in_rgb_mode) {
+        if (new_layer == _RGB && !is_in_rgb_mode) {
           is_in_rgb_mode = true;
           rgblight_sethsv_noeeprom(h, s, v);
         }
@@ -284,7 +311,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       return false;
     }
 
-    case TD(TD_4_F11_F5):
+    case TD(TD_NUM):
     case LT(4,KC_F11): {
       const uint8_t is_ctrl = (get_mods() & (MOD_BIT(KC_LCTL) | MOD_BIT(KC_RCTL)));
       if (record->event.pressed) {
@@ -319,36 +346,28 @@ int cur_dance (qk_tap_dance_state_t *state) {
   else return 8;
 }
 
-static tap tap_states [] = {
-  [TD_ENT_SPEC] = { .is_press_action = true, .state = 0 },
-  [TD_4_F11_F5] = { .is_press_action = true, .state = 0 }
-};
-
 void tapdance_oneach (qk_tap_dance_state_t *state, void *user_data) {
+  int id = (int)user_data;
+  tri_layer_action action = tri_layer_actions[id];
+
+  if (action.use_instant_layer && state->pressed) {
+    layer_on(action.single_hold);
+  }
 }
 
 void tapdance_onfinished (qk_tap_dance_state_t *state, void *user_data) {
   int id = (int)user_data;
   tap_states[id].state = cur_dance(state);
-  switch (id) {
-    case TD_ENT_SPEC: {
-      switch (tap_states[id].state) {
-        case SINGLE_TAP: register_code(KC_ENT); break;
-        case SINGLE_HOLD: layer_on(_SPECIAL); break;
-        case DOUBLE_TAP: layer_on(_SPECIAL); break;
-        case DOUBLE_HOLD: break;
-        case DOUBLE_SINGLE_TAP: break;
-      }
-      break;
-    }
+  tri_layer_action action = tri_layer_actions[id];
 
-    case TD_4_F11_F5: {
-      switch (tap_states[id].state) {
-        case SINGLE_TAP: register_code(KC_F11); break;
-        case SINGLE_HOLD: layer_on(_NUMPAD); break;
-        case DOUBLE_TAP: register_code(KC_F5); break;
-        case DOUBLE_HOLD: break;
-        case DOUBLE_SINGLE_TAP: break;
+  switch (tap_states[id].state) {
+    case SINGLE_TAP: register_code(action.single_tap); break;
+    case SINGLE_HOLD: layer_on(action.single_hold); break;
+    case DOUBLE_TAP: {
+      if (action.is_double_tap_layer_lock) {
+        layer_on(action.double_tap);
+      } else {
+        register_code(action.double_tap);
       }
       break;
     }
@@ -357,33 +376,23 @@ void tapdance_onfinished (qk_tap_dance_state_t *state, void *user_data) {
 
 void tapdance_onreset (qk_tap_dance_state_t *state, void *user_data) {
   int id = (int)user_data;
-  switch (id) {
-    case TD_ENT_SPEC: {
-      switch (tap_states[id].state) {
-        case SINGLE_TAP: unregister_code(KC_ENT); break;
-        case SINGLE_HOLD: layer_off(_SPECIAL); break;
-        case DOUBLE_TAP:  break;
-        case DOUBLE_HOLD: break;
-        case DOUBLE_SINGLE_TAP: break;
-      }
-      break;
-    }
+  tri_layer_action action = tri_layer_actions[id];
 
-    case TD_4_F11_F5: {
-      switch (tap_states[id].state) {
-        case SINGLE_TAP: unregister_code(KC_F11); break;
-        case SINGLE_HOLD: layer_off(_NUMPAD); break;
-        case DOUBLE_TAP: unregister_code(KC_F5); break;
-        case DOUBLE_HOLD: break;
-        case DOUBLE_SINGLE_TAP: break;
+  switch (tap_states[id].state) {
+    case SINGLE_TAP: unregister_code(action.single_tap); break;
+    case SINGLE_HOLD: layer_off(action.single_hold); break;
+    case DOUBLE_TAP: {
+      if (action.is_double_tap_layer_lock) {
+      } else {
+        unregister_code(action.double_tap);
       }
       break;
     }
   }
+
+  if (action.use_instant_layer) {
+    layer_off(action.single_hold);
+  }
+
   tap_states[id].state = 0;
 }
-
-qk_tap_dance_action_t tap_dance_actions[] = {
-  [TD_ENT_SPEC] = { .fn = { tapdance_oneach, tapdance_onfinished, tapdance_onreset }, .user_data = (void*)TD_ENT_SPEC },
-  [TD_4_F11_F5] = { .fn = { tapdance_oneach, tapdance_onfinished, tapdance_onreset }, .user_data = (void*)TD_4_F11_F5 }
-};
