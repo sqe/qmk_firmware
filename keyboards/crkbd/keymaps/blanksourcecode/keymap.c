@@ -9,21 +9,21 @@
 #endif
 
 extern keymap_config_t keymap_config;
-
+extern rgblight_config_t rgblight_config;
 extern uint8_t is_master;
 
 // Layer defines
-#define _COLEMAKDH 0
+#define _COLEMAK 0
 #define _CODING 1
 #define _ARROWS 2
-#define _MOUSE 3
-#define _NUMPAD 4
-#define _RGB 5
-#define _GAMING 6
+#define _NUMPAD 3
+#define _RGB 4
+#define _GAMING 5
 #define _TEMPLATE 7
 
 // Shorthand Macros
 #define KC_TD(a) TD(a)
+#define KC_TO(a) TO(a)
 #define KC_LGZ LGUI_T(KC_Z)
 #define KC_LAX LALT_T(KC_X)
 #define KC_SHL LSFT_T(KC_LEFT)
@@ -33,6 +33,17 @@ extern uint8_t is_master;
 #define KC_SDEL LSFT_T(KC_DEL)
 #define KC_ASPC LT(_ARROWS,KC_SPC)
 #define KC_CESC LCTL_T(KC_ESC)
+#define KC_RTG RGB_TOG
+#define KC_RHI RGB_HUI
+#define KC_RHD RGB_HUD
+#define KC_RSI RGB_SAI
+#define KC_RSD RGB_SAD
+#define KC_RVI RGB_VAI
+#define KC_RVD RGB_VAD
+#define KC_RMI RGB_MOD
+#define KC_RMD RGB_RMOD
+#define KC_RMP RGB_M_P
+#define KC_RMR RGB_M_R
 
 // Custom keycodes
 enum {
@@ -95,25 +106,25 @@ qk_tap_dance_action_t tap_dance_actions[] = {
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-  [_COLEMAKDH] = LAYOUT_kc( \
+  [_COLEMAK] = LAYOUT_kc( \
   //,-----------------------------------------.                ,-----------------------------------------.
-        TAB,   Q,     W,     F,     P,     B,                      J,     L,     U,     Y,  SCLN,  BSPC,\
+        TAB,   Q,     W,     F,     P,     B,                      J,     L,     U,     Y,  SCLN,   BSPC,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
-       BSPC,   A,     R,     S,     T,     G,                      M,     N,     E,     I,    O,   QUOT,\
+       BSPC,   A,     R,     S,     T,     G,                      M,     N,     E,     I,    O,    QUOT,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
-       CESC,  LGZ,  LAX,     C,     D,     V,                      K,     H,  COMM,   DOT,  SLSH,  RSFT,\
+       CESC,  LGZ,  LAX,     C,     D,     V,                      K,     H,  COMM,   DOT,  SLSH,  TO(5),\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                          TD(TD_NUM),TD(TD_SPC),SDEL,      ENT,  ASPC,  TRNS \
+                          TD(TD_NUM),TD(TD_SPC),SDEL,      ENT,  ASPC,TD(TD_ENT) \
                               //`--------------------'  `--------------------'
   ),
 
   [_CODING] = LAYOUT_kc( \
   //,-----------------------------------------.                ,-----------------------------------------.
-        F1,  TILD,  TRNS,  TRNS,  PPLS,   EQL,                   PIPE,  LCBR,  RCBR,  CIRC,  COLN,  TRNS,\
+        F1,  TILD,   DLR,  LCBR,  PPLS,   EQL,                   PIPE,  LCBR,  RCBR,  CIRC,  COLN,  TRNS,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
       TRNS,   GRV,   DLR,  ASTR,  PMNS,    GT,                   AMPR,  LPRN,  RPRN,  LBRC,  RBRC,  DQUO,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
-      TRNS,  TRNS,  TRNS,  PERC,  UNDS,    LT,                   EXLM,   EQL,    LT,    GT,  QUES,  TRNS,\
+      TRNS,  TRNS,  TRNS,  PERC,  UNDS,    LT,                   EXLM,   EQL,    LT,    GT,  QUES, TO(0),\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
                                   TRNS,  TRNS,  TRNS,     TRNS,  TRNS,  TRNS \
                               //`--------------------'  `--------------------'
@@ -121,11 +132,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_ARROWS] = LAYOUT_kc( \
   //,-----------------------------------------.                ,-----------------------------------------.
-      TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                   TRNS,  CTLL,   UP,   CTLR,  TRNS,  TRNS,\
+     TO(0),  TILD,   GRV,  TRNS,  TRNS,  TRNS,                   TRNS,  CTLL,   UP,   CTLR,  TRNS,  TRNS,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
-      TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                   HOME,  LEFT,  DOWN,  RGHT,   END,  TRNS,\
+      TRNS,  EXLM,    AT,  HASH,   DLR,  PERC,                   HOME,  LEFT,  DOWN,  RGHT,   END,  TRNS,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
-      TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                   TRNS,   SHL,  TRNS,   SHR,  TRNS,  TRNS,\
+      TRNS,  CIRC,  AMPR,  ASTR,  TRNS,  TRNS,                   TRNS,   SHL,  TRNS,   SHR,  TRNS, TO(1),\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
                                   TRNS,  TRNS,  TRNS,     TRNS,  TRNS,  TRNS \
                               //`--------------------'  `--------------------'
@@ -133,13 +144,37 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_NUMPAD] = LAYOUT_kc( \
   //,-----------------------------------------.                ,-----------------------------------------.
-      TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                   TRNS,    P7,    P8,    P9,  PMNS,  TRNS,\
+     TO(0),  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                   TRNS,    P7,    P8,    P9,  PMNS,  TRNS,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                   TRNS,    P4,    P5,    P6,  PPLS,  TRNS,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
-      TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                   TRNS,    P1,    P2,    P3,   EQL,  TRNS,\
+      TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                   TRNS,    P1,    P2,    P3,   EQL, TO(2),\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
                                   TRNS,  TRNS,  TRNS,     TRNS,    P0,  PDOT \
+                              //`--------------------'  `--------------------'
+  ),
+
+  [_RGB] = LAYOUT_kc( \
+  //,-----------------------------------------.                ,-----------------------------------------.
+     TO(0),  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                    RTG,   RHI,   RHD,  TRNS,  TRNS,   RMP,\
+  //|------+------+------+------+------+------|                |------+------+------+------+------+------|
+      TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                    RMI,   RSI,   RSD,  TRNS,  TRNS,   RMR,\
+  //|------+------+------+------+------+------|                |------+------+------+------+------+------|
+      TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                    RMD,   RVI,   RVD,  TRNS,  TRNS, TO(3),\
+  //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
+                                  TRNS,  TRNS,  TRNS,     TRNS,  TRNS,  TRNS \
+                              //`--------------------'  `--------------------'
+  ),
+
+  [_GAMING] = LAYOUT_kc( \
+  //,-----------------------------------------.                ,-----------------------------------------.
+     TO(0),  TRNS,     W,  TRNS,  TRNS,  TRNS,                   TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,\
+  //|------+------+------+------+------+------|                |------+------+------+------+------+------|
+      TRNS,     S,     A,     D,  TRNS,  TRNS,                   TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,\
+  //|------+------+------+------+------+------|                |------+------+------+------+------+------|
+      TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                   TRNS,  TRNS,  TRNS,  TRNS,  TRNS, TO(4),\
+  //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
+                                  TRNS,   SPC,  TRNS,     TRNS,  TRNS,  TRNS \
                               //`--------------------'  `--------------------'
   ),
 
@@ -169,10 +204,44 @@ void set_keylog(uint16_t keycode, keyrecord_t *record);
 const char *read_keylog(void);
 const char *read_keylogs(void);
 
-// const char *read_mode_icon(bool swap);
-// const char *read_host_led_state(void);
-// void set_timelog(void);
-// const char *read_timelog(void);
+
+// Screen printing
+char layer_state_str[24];
+const char *write_layer(void){
+  switch (biton32(layer_state))
+  {
+  case _COLEMAK:
+    snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Colemak-DH");
+    break;
+  case _CODING:
+    snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Code Symbols");
+    break;
+  case _ARROWS:
+    snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Navigation");
+    break;
+  case _NUMPAD:
+    snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Numpad");
+    break;
+  case _RGB:
+    snprintf(layer_state_str, sizeof(layer_state_str), "Layer: RGB Lighting");
+    break;
+  case _GAMING:
+    snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Gaming Mode");
+    break;
+  default:
+    snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Id-%ld", layer_state);
+  }
+
+  return layer_state_str;
+}
+
+char rbf_info_str[24];
+const char *write_rgb(void) {
+  snprintf(rbf_info_str, sizeof(rbf_info_str), "%s %2d h%3d s%3d v%3d",
+    rgblight_config.enable ? "on" : "- ", rgblight_config.mode,
+    rgblight_config.hue, rgblight_config.sat, rgblight_config.val);
+  return rbf_info_str;
+}
 
 void matrix_scan_user(void) {
    iota_gfx_task();
@@ -180,13 +249,9 @@ void matrix_scan_user(void) {
 
 void matrix_render_user(struct CharacterMatrix *matrix) {
   if (is_master) {
-    // If you want to change the display of OLED, you need to change here
-    matrix_write_ln(matrix, read_layer_state());
-    matrix_write_ln(matrix, read_keylog());
-    matrix_write_ln(matrix, read_keylogs());
-    //matrix_write_ln(matrix, read_mode_icon(keymap_config.swap_lalt_lgui));
-    //matrix_write_ln(matrix, read_host_led_state());
-    //matrix_write_ln(matrix, read_timelog());
+    matrix_write_ln(matrix, write_layer());
+    matrix_write_ln(matrix, "");
+    matrix_write_ln(matrix, write_rgb());
   } else {
     matrix_write(matrix, read_logo());
   }
@@ -207,7 +272,7 @@ void iota_gfx_task_user(void) {
 }
 
 // Base layer color values
-uint16_t h = 240;
+uint16_t h = 156;
 uint8_t s = 255;
 uint8_t v = 255;
 bool is_in_rgb_mode = false;
@@ -230,7 +295,7 @@ uint32_t layer_state_set_user(uint32_t state) {
         uint8_t newS = rgblight_get_sat();
         uint8_t newV = rgblight_get_val();
 
-        if (newH != 300 || newS != 255 || newV != v) {
+        if (newH != 120 || newS != 255 || newV != v) {
           h = newH;
           s = newS;
           v = newV;
@@ -239,20 +304,17 @@ uint32_t layer_state_set_user(uint32_t state) {
     }
 
     switch (new_layer) {
-      case _COLEMAKDH:
+      case _COLEMAK:
         rgblight_sethsv_noeeprom(h, s, v);
         break;
       case _CODING:
         rgblight_sethsv_noeeprom(0, 255, v);
         break;
       case _ARROWS:
-        rgblight_sethsv_noeeprom(120, 255, v);
-        break;
-      case _MOUSE:
-        rgblight_sethsv_noeeprom(180, 255, v);
+        rgblight_sethsv_noeeprom(83, 255, v);
         break;
       case _NUMPAD:
-        rgblight_sethsv_noeeprom(60, 255, v);
+        rgblight_sethsv_noeeprom(43, 255, v);
         // Ensure numlock is on so we can actually use the number keys
         if (!(host_keyboard_leds() & (1<<USB_LED_NUM_LOCK))) {
           register_code(KC_NUMLOCK);
@@ -260,7 +322,7 @@ uint32_t layer_state_set_user(uint32_t state) {
         }
         break;
       case _RGB:
-        rgblight_sethsv_noeeprom(300, 255, v);
+        rgblight_sethsv_noeeprom(120, 255, v);
         break;
       case _GAMING:
         rgblight_sethsv_noeeprom(120, 85, v);
