@@ -30,6 +30,7 @@ SRC +=  ./lib/glcdfont.c \
         # ./lib/timelogger.c \
 
 TAP_DANCE_ENABLE = yes
+RAW_ENABLE = yes
 
 Link_Time_Optimization = yes # if firmware size over limit, try this option
 EXTRAFLAGS += -flto

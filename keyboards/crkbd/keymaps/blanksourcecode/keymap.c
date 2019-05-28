@@ -8,6 +8,8 @@
   #include "ssd1306.h"
 #endif
 
+#include "raw_hid.h"
+
 extern keymap_config_t keymap_config;
 extern rgblight_config_t rgblight_config;
 extern uint8_t is_master;
@@ -235,10 +237,12 @@ const char *write_layer(void){
   return layer_state_str;
 }
 
+bool foundHID = false;
+
 char rbf_info_str[24];
 const char *write_rgb(void) {
   snprintf(rbf_info_str, sizeof(rbf_info_str), "%s %2d h%3d s%3d v%3d",
-    rgblight_config.enable ? "on" : "- ", rgblight_config.mode,
+    rgblight_config.enable ? "rgb" : "---", rgblight_config.mode,
     rgblight_config.hue, rgblight_config.sat, rgblight_config.val);
   return rbf_info_str;
 }
@@ -250,10 +254,10 @@ void matrix_scan_user(void) {
 void matrix_render_user(struct CharacterMatrix *matrix) {
   if (is_master) {
     matrix_write_ln(matrix, write_layer());
-    matrix_write_ln(matrix, "");
+    matrix_write_ln(matrix, foundHID ? "found hid" : "");
     matrix_write_ln(matrix, write_rgb());
   } else {
-    matrix_write(matrix, read_logo());
+    matrix_write_ln(matrix, write_layer());
   }
 }
 
@@ -267,8 +271,14 @@ void matrix_update(struct CharacterMatrix *dest, const struct CharacterMatrix *s
 void iota_gfx_task_user(void) {
   struct CharacterMatrix matrix;
   matrix_clear(&matrix);
-  matrix_render_user(&matrix);
+  matrix_render_user(&matrix)
   matrix_update(&display, &matrix);
+}
+
+void ( uint8_t *data, uint8_t length )
+{
+	foundHID = true;
+	raw_hid_send( data, length );
 }
 
 // Base layer color values
@@ -335,7 +345,7 @@ uint32_t layer_state_set_user(uint32_t state) {
   return state;
 }
 
-bool is_ctrl_tabbing = 0;
+bool is_ctrl_shifting = 0;
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
@@ -355,32 +365,24 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       return true;
     }
 
-    case SHIFT_TAB: {
+    case KC_BSPC: {
       const uint8_t is_ctrl = (get_mods() & (MOD_BIT(KC_LCTL) | MOD_BIT(KC_RCTL)));
-      const uint8_t is_shift = (get_mods() & (MOD_BIT(KC_LSFT) | MOD_BIT(KC_RSFT)));
 
       if (record->event.pressed) {
         if (is_ctrl) {
-          // CTRL + Tab gets converted to SHIFT + Tab
-          is_ctrl_tabbing = true;
-          unregister_code(KC_LCTRL);
+          // CTRL + Backspace gets converted to CTRL + SHIFT
+          is_ctrl_shifting = true;
           register_code(KC_LSFT);
-          register_code(KC_TAB);
         } else {
-          register_code(KC_TAB);
+          register_code(KC_BSPC);
         }
       } else {
-        if (is_ctrl_tabbing) {
-          // Turn off the SHIFT + Tab
-          is_ctrl_tabbing = false;
+        if (is_ctrl_shifting) {
+          // Turn off the CTRL + SHIFT
+          is_ctrl_shifting = false;
           unregister_code(KC_LSFT);
-          unregister_code(KC_TAB);
-          if (is_shift) {
-            // Re-register CTRL if the mod button was still held down
-            register_code(KC_LCTRL);
-          }
         } else {
-          unregister_code(KC_TAB);
+          unregister_code(KC_BSPC);
         }
       }
 
