@@ -46,11 +46,13 @@ extern uint8_t is_master;
 #define KC_RMD RGB_RMOD
 #define KC_RMP RGB_M_P
 #define KC_RMR RGB_M_R
+#define KC_BBS BACK_SLASH
 
 // Custom keycodes
 enum {
   SHIFT_TAB = SAFE_RANGE,
-  REDO_NUM_F11
+  REDO_NUM_F11,
+  BACK_SLASH
 };
 
 // Tap-dance built-ins
@@ -110,7 +112,7 @@ qk_tap_dance_action_t tap_dance_actions[] = {
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [_COLEMAK] = LAYOUT_kc( \
   //,-----------------------------------------.                ,-----------------------------------------.
-        TAB,   Q,     W,     F,     P,     B,                      J,     L,     U,     Y,  SCLN,   BSPC,\
+        TAB,   Q,     W,     F,     P,     B,                      J,     L,     U,     Y,  SCLN,    BBS,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
        BSPC,   A,     R,     S,     T,     G,                      M,     N,     E,     I,    O,    QUOT,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
@@ -241,10 +243,16 @@ bool foundHID = false;
 
 char rbf_info_str[24];
 const char *write_rgb(void) {
-  snprintf(rbf_info_str, sizeof(rbf_info_str), "%s %2d h%3d s%3d v%3d",
-    rgblight_config.enable ? "rgb" : "---", rgblight_config.mode,
+  snprintf(rbf_info_str, sizeof(rbf_info_str), "%s: %02d h%03d s%03d v%03d",
+    rgblight_config.enable ? "\x02A" : "-", rgblight_config.mode,
     rgblight_config.hue, rgblight_config.sat, rgblight_config.val);
   return rbf_info_str;
+}
+
+char hid_info_str[24];
+const char *write_hid(void) {
+  snprintf(hid_info_str, sizeof(hid_info_str), "%s", foundHID ? "found hid" : " ");
+  return hid_info_str;
 }
 
 void matrix_scan_user(void) {
@@ -254,7 +262,7 @@ void matrix_scan_user(void) {
 void matrix_render_user(struct CharacterMatrix *matrix) {
   if (is_master) {
     matrix_write_ln(matrix, write_layer());
-    matrix_write_ln(matrix, foundHID ? "found hid" : "");
+    matrix_write_ln(matrix, write_hid());
     matrix_write_ln(matrix, write_rgb());
   } else {
     matrix_write_ln(matrix, write_layer());
@@ -271,11 +279,11 @@ void matrix_update(struct CharacterMatrix *dest, const struct CharacterMatrix *s
 void iota_gfx_task_user(void) {
   struct CharacterMatrix matrix;
   matrix_clear(&matrix);
-  matrix_render_user(&matrix)
+  matrix_render_user(&matrix);
   matrix_update(&display, &matrix);
 }
 
-void ( uint8_t *data, uint8_t length )
+void raw_hid_receive(uint8_t *data, uint8_t length)
 {
 	foundHID = true;
 	raw_hid_send( data, length );
@@ -346,6 +354,7 @@ uint32_t layer_state_set_user(uint32_t state) {
 }
 
 bool is_ctrl_shifting = 0;
+bool is_back_shifting = 0;
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
@@ -363,6 +372,31 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
       }
       return true;
+    }
+
+    case BACK_SLASH: {
+      const uint8_t is_shift = (get_mods() & (MOD_BIT(KC_LSFT) | MOD_BIT(KC_RSFT)));
+
+      if (record->event.pressed) {
+        if (is_shift) {
+          is_back_shifting = true;
+          unregister_code(KC_LSFT);
+          register_code(KC_BSLS);
+        } else {
+          register_code(KC_BSPC);
+        }
+      } else {
+        if (is_back_shifting) {
+          is_back_shifting = false;
+          if (is_shift) {
+            register_code(KC_LSFT);
+          }
+        } else {
+          unregister_code(KC_BSPC);
+        }
+      }
+
+      return false;
     }
 
     case KC_BSPC: {
