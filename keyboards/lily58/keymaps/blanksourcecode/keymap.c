@@ -448,6 +448,21 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   return true;
 }
 
+// Rotary Encoder
+void encoder_update_user(uint8_t index, bool clockwise) {
+  switch (biton32(layer_state)) {
+    default: {
+      // Page up and Page down on all layers
+      if (clockwise) {
+        tap_code(KC_PGDN);
+      } else {
+        tap_code(KC_PGUP);
+      }
+      break;
+    }
+  }
+}
+
 // Tap Dance
 int cur_dance (qk_tap_dance_state_t *state) {
   if (state->count == 1) {
