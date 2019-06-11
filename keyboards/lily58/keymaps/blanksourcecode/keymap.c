@@ -8,6 +8,10 @@
   #include "ssd1306.h"
 #endif
 
+// Add headers for raw hid communication
+#include <split_scomm.h>
+#include "raw_hid.h"
+
 extern keymap_config_t keymap_config;
 extern rgblight_config_t rgblight_config;
 extern uint8_t is_master;
@@ -228,6 +232,70 @@ void matrix_scan_user(void) {
    iota_gfx_task();
 }
 
+// HID input
+bool is_hid_connected = false; // Flag indicating if we have a PC connection yet
+uint8_t screen_max_count = 0;  // Number of info screens we can scroll through (set by connecting node script)
+uint8_t screen_show_index = 0; // Current index of the info screen we are displaying
+uint8_t screen_data_buffer[SERIAL_SCREEN_BUFFER_LENGTH - 1] =  {0}; // Buffer used to store the screen data sent by connected node script
+int screen_data_index = 0; // Current index into the screen_data_buffer that we should write to
+
+void raw_hid_send_screen_index(void) {
+  // Send the current info screen index to the connected node script so that it can pass back the new data
+  uint8_t send_data[32] = {0};
+  send_data[0] = screen_show_index + 1; // Add one so that we can distinguish it from a null byte
+  raw_hid_send(send_data, sizeof(send_data));
+}
+
+void raw_hid_receive(uint8_t *data, uint8_t length) {
+  // PC connected, so set the flag to show a message on the master display
+  is_hid_connected = true;
+
+  // Initial connections use '1' in the first byte to indicate this
+  if (length > 1 && data[0] == 1) {
+    // New connection so restart screen_data_buffer
+    screen_data_index = 0;
+
+    // The second byte is the number of info screens the connected node script allows us to scroll through
+    screen_max_count = data[1];
+    if (screen_show_index >= screen_max_count) {
+      screen_show_index = 0;
+    }
+
+    // Tell the connection which info screen we want to look at initially
+    raw_hid_send_screen_index();
+    return;
+  }
+
+  // Otherwise the data we receive is one line of the screen to show on the display
+  if (length >= 21) {
+    // Copy the data into our buffer and increment the number of lines we have got so far
+    memcpy((char*)&screen_data_buffer[screen_data_index * 21], data, 21);
+    screen_data_index++;
+
+    // Once we reach 4 lines, we have a full screen
+    if (screen_data_index == 4) {
+      // Reset the buffer back to receive the next full screen data
+      screen_data_index = 0;
+
+      // Now get ready to transfer the whole 4 lines to the slave side of the keyboard.
+      // First clear the transfer buffer with spaces just in case.
+      memset((char*)&serial_slave_screen_buffer[0], ' ', sizeof(serial_slave_screen_buffer));
+
+      // Copy in the 4 lines of screen data, but start at index 1, we use index 0 to indicate a connection in the slave code
+      memcpy((char*)&serial_slave_screen_buffer[1], screen_data_buffer, sizeof(screen_data_buffer));
+
+      // Set index 0 to indicate a connection has been established
+      serial_slave_screen_buffer[0] = 1;
+
+      // Make sure to zero terminate the buffer
+      serial_slave_screen_buffer[sizeof(serial_slave_screen_buffer) - 1] = 0;
+
+      // Indicate that the screen data has changed and needs transferring to the slave side
+      hid_screen_change = true;
+    }
+  }
+}
+
 // Screen printing
 char layer_state_str[20];
 const char *write_layer(void) {
@@ -268,15 +336,34 @@ const char *write_rgb(void) {
   return rbf_info_str;
 }
 
+char hid_info_str[20];
+const char *write_hid(void) {
+  snprintf(hid_info_str, sizeof(hid_info_str), "%s", is_hid_connected ? "connected." : " ");
+  return hid_info_str;
+}
+
+void write_slave_info_screen(struct CharacterMatrix *matrix) {
+  if (serial_slave_screen_buffer[0] > 0) {
+    // If the first byte of the buffer is non-zero we should have a full set of data to show,
+    // So we copy it into the display
+    matrix_write(matrix, (char*)serial_slave_screen_buffer + 1);
+  } else {
+    // Otherwise we just draw the logo
+    matrix_write_ln(matrix, "");
+    matrix_write(matrix, read_logo());
+  }
+}
+
 void matrix_render_user(struct CharacterMatrix *matrix) {
   if (is_master) {
     // Show layer and rgb values on the master side
     matrix_write_ln(matrix, write_layer());
     matrix_write_ln(matrix, " ");
     matrix_write_ln(matrix, write_rgb());
+    matrix_write(matrix, write_hid()); // Add if we have a connection established
   } else {
-    // Show the logo on the slave side
-    matrix_write(matrix, read_logo());
+    // Show the logo or screen info on the slave side
+    write_slave_info_screen(matrix);
   }
 }
 
@@ -451,6 +538,32 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 // Rotary Encoder
 void encoder_update_user(uint8_t index, bool clockwise) {
   switch (biton32(layer_state)) {
+    case _RGB: {
+      // On the RGB layer we control the screen display with the encoder
+      if (clockwise) {
+        // Increment and loop back to beginning if we go over the max
+        screen_show_index++;
+        if (screen_show_index >= screen_max_count) {
+          screen_show_index = 0;
+        }
+      } else {
+        // Decrement and loop back to the end if we are about to go below zero,
+        // Be careful since index is unsigned.
+        if (screen_show_index == 0) {
+          screen_show_index = screen_max_count - 1;
+        } else {
+          screen_show_index--;
+        }
+      }
+
+      // If we have a connection we should tell it about the change,
+      // Otherwise it will be notified when it first connects instead.
+      if (is_hid_connected) {
+        raw_hid_send_screen_index();
+      }
+      break;
+    }
+
     default: {
       // Page up and Page down on all layers
       if (clockwise) {

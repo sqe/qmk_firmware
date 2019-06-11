@@ -25,3 +25,8 @@ SRC +=  ./glcdfont.c \
         ./lib/logo_reader.c \
 
 TAP_DANCE_ENABLE = yes
+
+RAW_ENABLE = yes            # Enable RAW HID communication to PC
+
+Link_Time_Optimization = yes # Reduce size of firmware by optimizing at link time
+EXTRAFLAGS += -flto
