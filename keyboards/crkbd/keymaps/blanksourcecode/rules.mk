@@ -21,6 +21,7 @@ SLEEP_LED_ENABLE = no    # Breathing sleep LED during USB suspend
 
 # If you want to change the display of OLED, you need to change here
 SRC +=  ./glcdfont.c \
+        ./lib/logo_reader.c \
 
 TAP_DANCE_ENABLE = yes
 RAW_ENABLE = yes

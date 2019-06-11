@@ -8,6 +8,7 @@
   #include "ssd1306.h"
 #endif
 
+#include <split_scomm.h>
 #include "raw_hid.h"
 
 extern keymap_config_t keymap_config;
@@ -148,9 +149,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_NUMPAD] = LAYOUT_kc( \
   //,-----------------------------------------.                ,-----------------------------------------.
-     TO(0),  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                   TRNS,    P7,    P8,    P9,  PMNS,  TRNS,\
+     TO(0),     1,     2,     3,     4,     5,                   TRNS,    P7,    P8,    P9,  PMNS,  TRNS,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
-      TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                   TRNS,    P4,    P5,    P6,  PPLS,  TRNS,\
+      TRNS,     6,     7,     8,     9,     0,                   TRNS,    P4,    P5,    P6,  PPLS,  TRNS,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                   TRNS,    P1,    P2,    P3,   EQL, TO(2),\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
@@ -198,7 +199,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 int RGB_current_mode;
 
 void matrix_init_user(void) {
-    iota_gfx_init(!has_usb());
+    iota_gfx_init(false);
 }
 
 // When add source files to SRC in rules.mk, you can use functions.
@@ -208,9 +209,9 @@ void set_keylog(uint16_t keycode, keyrecord_t *record);
 const char *read_keylog(void);
 const char *read_keylogs(void);
 
-
 // Screen printing
-char layer_state_str[24];
+bool foundHID = false;
+char layer_state_str[20];
 const char *write_layer(void){
   switch (biton32(layer_state))
   {
@@ -239,8 +240,6 @@ const char *write_layer(void){
   return layer_state_str;
 }
 
-bool foundHID = false;
-
 char rbf_info_str[24];
 const char *write_rgb(void) {
   snprintf(rbf_info_str, sizeof(rbf_info_str), "%s: %02d h%03d s%03d v%03d",
@@ -249,10 +248,58 @@ const char *write_rgb(void) {
   return rbf_info_str;
 }
 
-char hid_info_str[24];
+char hid_info_str[20];
 const char *write_hid(void) {
-  snprintf(hid_info_str, sizeof(hid_info_str), "%s", foundHID ? "found hid" : " ");
+  snprintf(hid_info_str, sizeof(hid_info_str), "%s", foundHID ? "connected." : " ");
   return hid_info_str;
+}
+
+char cpu_info_str[20];
+char mem_info_str[20];
+char dsk_info_str[20];
+char net_info_str[20];
+char screen_str[22 * 4];
+void write_stats(struct CharacterMatrix *matrix) {
+  if (serial_slave_screen_buffer[0] > 0) {
+    matrix_write(matrix, (char*)serial_slave_screen_buffer + 1);
+  } else {
+    matrix_write_ln(matrix, "");
+    matrix_write(matrix, read_logo());
+  }
+}
+
+// HID input
+void raw_hid_receive(uint8_t *data, uint8_t length)
+{
+  foundHID = true;
+  if (length >= 5) {
+      memset((char*)&serial_slave_screen_buffer[0], ' ', sizeof(serial_slave_screen_buffer));
+
+      memcpy((char*)&serial_slave_screen_buffer[1], "cpu:", 4);
+      memcpy((char*)&serial_slave_screen_buffer[22], "mem:", 4);
+      memcpy((char*)&serial_slave_screen_buffer[43], "dsk:", 4);
+      memcpy((char*)&serial_slave_screen_buffer[64], "net:", 4);
+
+      for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < data[i]; j++) {
+          serial_slave_screen_buffer[1 + (i * 21) + 5 + j] = 'o';
+        }
+        serial_slave_screen_buffer[1 + (i * 21) + 16] = '|';
+      }
+
+      serial_slave_screen_buffer[0] = 1;
+      serial_slave_screen_buffer[sizeof(serial_slave_screen_buffer) - 1] = 0;
+
+      data[0] = length;
+      data[1] = serial_slave_screen_buffer[0];
+      data[2] = serial_slave_screen_buffer[1];
+      data[3] = serial_slave_screen_buffer[22];
+      data[4] = serial_slave_screen_buffer[43];
+      data[5] = serial_slave_screen_buffer[64];
+      raw_hid_send(data, length);
+
+      hid_screen_change = true;
+  }
 }
 
 void matrix_scan_user(void) {
@@ -262,10 +309,11 @@ void matrix_scan_user(void) {
 void matrix_render_user(struct CharacterMatrix *matrix) {
   if (is_master) {
     matrix_write_ln(matrix, write_layer());
-    matrix_write_ln(matrix, write_hid());
+    matrix_write_ln(matrix, " ");
     matrix_write_ln(matrix, write_rgb());
+    matrix_write(matrix, write_hid());
   } else {
-    matrix_write_ln(matrix, write_layer());
+    write_stats(matrix);
   }
 }
 
@@ -281,12 +329,6 @@ void iota_gfx_task_user(void) {
   matrix_clear(&matrix);
   matrix_render_user(&matrix);
   matrix_update(&display, &matrix);
-}
-
-void raw_hid_receive(uint8_t *data, uint8_t length)
-{
-	foundHID = true;
-	raw_hid_send( data, length );
 }
 
 // Base layer color values
@@ -355,6 +397,7 @@ uint32_t layer_state_set_user(uint32_t state) {
 
 bool is_ctrl_shifting = 0;
 bool is_back_shifting = 0;
+bool is_ctrl_shift_ent = 0;
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
@@ -407,6 +450,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
           // CTRL + Backspace gets converted to CTRL + SHIFT
           is_ctrl_shifting = true;
           register_code(KC_LSFT);
+          register_code(KC_LCTL);
         } else {
           register_code(KC_BSPC);
         }
@@ -439,6 +483,24 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
           return false;
         }
       }
+
+      return true;
+    }
+
+    case LSFT_T(KC_DEL): {
+      const uint8_t is_shift = (get_mods() & (MOD_BIT(KC_LSFT) | MOD_BIT(KC_RSFT)));
+      const uint8_t is_ctrl = (get_mods() & (MOD_BIT(KC_LCTL) | MOD_BIT(KC_RCTL)));
+      if (is_shift && is_ctrl) {
+        if (record->event.pressed) {
+          is_ctrl_shift_ent = true;
+          clear_mods();
+          tap_code(KC_ENT);
+          unregister_code(KC_LSFT);
+          unregister_code(KC_LCTL);
+        }
+        return false;
+      }
+      return true;
     }
   }
 
