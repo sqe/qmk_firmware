@@ -194,13 +194,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_GAMING] = LAYOUT_kc( \
   // .-----------------------------------------.                    .-----------------------------------------.
-      TO(0),  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS, \
+       ESC,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS, \
   // |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-       TRNS,  TRNS,    W,   TRNS,  TRNS,  TRNS,                       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS, \
+       TRNS,    Q,    W,     E,     R,     T,                        TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS, \
   // |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-       TRNS,    A,     S,     D,   TRNS,  TRNS,                       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS, \
+       TRNS,    A,     S,     D,    F,     G,                        TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS, \
   // |------+------+------+------+------+------|-------|    |-------|------+------+------+------+------+------|
-       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,        TRNS,   TRNS,  TRNS,  TRNS,  TRNS,  TRNS, TO(4), \
+       TRNS,  TRNS,  TRNS,  TRNS,   V,     B,   TRNS,        TRNS,   TRNS,  TRNS,  TRNS,  TRNS,  TRNS, TO(4), \
   // `-----------------------------------------/-------/    \-------\-----------------------------------------'
                          TRNS,  TRNS,  SPC,    TRNS,             TRNS,   TRNS,  TRNS,  TRNS  \
   //                   `------+------+------''------'          '-------''------+------+------'
