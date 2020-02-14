@@ -32,7 +32,7 @@ extern uint8_t is_master;
 #define KC_LAX LALT_T(KC_X)
 #define KC_SHL LSFT_T(KC_LEFT)
 #define KC_SHR LSFT_T(KC_RGHT)
-#define KC_CF5 LCTL_T(KC_F5)
+#define KC_CET LCTL_T(KC_ENT)
 #define KC_CTLL LCTL_T(KC_LEFT)
 #define KC_CTLR LCTL_T(KC_RGHT)
 #define KC_SDEL LSFT_T(KC_DEL)
@@ -97,7 +97,7 @@ enum {
 };
 
 static tri_layer_action tri_layer_actions [] = {
-  [TD_ENT] = { .single_tap = KC_ENT, .single_hold = _RGB, .double_tap = _RGB, .is_double_tap_layer_lock = true, .use_instant_layer = false },
+  [TD_ENT] = { .single_tap = KC_ENT, .single_hold = _ARROWS, .double_tap = _ARROWS, .is_double_tap_layer_lock = true, .use_instant_layer = false },
   [TD_NUM] = { .single_tap = KC_F11, .single_hold = _NUMPAD, .double_tap = KC_F5, .is_double_tap_layer_lock = false, .use_instant_layer = true  },
   [TD_SPC] = { .single_tap = KC_SPC, .single_hold = _CODING, .double_tap = KC_SPC, .is_double_tap_layer_lock = false, .use_instant_layer = true  },
   [TD_SFT] = { .single_tap = KC_ENT, .single_hold = _CODING, .double_tap = KC_SPC, .is_double_tap_layer_lock = false, .use_instant_layer = true  },
@@ -130,7 +130,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // |------+------+------+------+------+------|                    |------+------+------+------+------+------|
         LSB,   A,     R,     S,     T,    G,                           M,     N,     E,     I,     O,    QUOT, \
   // |------+------+------+------+------+------|-------|    |-------|------+------+------+------+------+------|
-        CF5,  LGZ,   LAX,    C,     D,    V,   TD(ENT),      TD(DEL),  K,    H,     COMM,   DOT,  SLSH, TO(5), \
+        CET,  LGZ,   LAX,    C,     D,    V,   TD(ENT),      TD(DEL),  K,    H,     COMM,   DOT,  SLSH, TO(5), \
   // `-----------------------------------------/-------/    \-------\-----------------------------------------'
                          F10, TD(NUM),TD(SPC), SDEL,            ENT,    ASPC,   TRNS,   TRNS  \
   //                   `------+------+------''------'          '-------''------+------+------'
@@ -564,12 +564,30 @@ void encoder_update_user(uint8_t index, bool clockwise) {
       break;
     }
 
-    default: {
-      // Page up and Page down on all layers
+    case _ARROWS: {
+      // ALT + LEFT and ALT + RIGHT (Forward/Back in vs/code) on Arrow layer
       if (clockwise) {
-        tap_code(KC_PGDN);
+        register_code(KC_LALT);
+				tap_code(KC_LEFT);
+				unregister_code(KC_LALT);
       } else {
-        tap_code(KC_PGUP);
+        register_code(KC_LALT);
+				tap_code(KC_RIGHT);
+				unregister_code(KC_LALT);
+      }
+      break;
+    }
+
+    default: {
+      // ALT + UP and ALT + DOWN (Move line in vs/code) on all layers
+      if (clockwise) {
+        register_code(KC_LALT);
+				tap_code(KC_UP);
+				unregister_code(KC_LALT);
+      } else {
+        register_code(KC_LALT);
+				tap_code(KC_DOWN);
+				unregister_code(KC_LALT);
       }
       break;
     }
