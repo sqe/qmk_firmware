@@ -121,105 +121,12 @@ qk_tap_dance_action_t tap_dance_actions[] = {
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-
-  [_COLEMAK] = LAYOUT_kc( \
-  // .-----------------------------------------.                    .-----------------------------------------.
-        ESC,   1,     2,     3,     4,    5,                           6,     7,     8,     9,     0,    BSPC, \
-  // |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-        TAB,   Q,     W,     F,     P,    B,                           J,     L,     U,     Y,    SCLN,  BSLS, \
-  // |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-        LSB,   A,     R,     S,     T,    G,                           M,     N,     E,     I,     O,    QUOT, \
-  // |------+------+------+------+------+------|-------|    |-------|------+------+------+------+------+------|
-        CET,  LGZ,   LAX,    C,     D,    V,   TD(ENT),      TD(DEL),  K,    H,     COMM,   DOT,  SLSH, TO(5), \
-  // `-----------------------------------------/-------/    \-------\-----------------------------------------'
-                         F10, TD(NUM),TD(SPC), SDEL,            ENT,    ASPC,   TRNS,   TRNS  \
-  //                   `------+------+------''------'          '-------''------+------+------'
-  ),
-
-  [_CODING] = LAYOUT_kc( \
-  // .-----------------------------------------.                    .-----------------------------------------.
-      TO(0),   F1,    F2,    F3,    F4,    F5,                         F6,    F7,    F8,    F9,   F10,   F11, \
-  // |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-       TRNS,  TILD,   DLR,  LCBR,  PPLS,   EQL,                       PIPE,  LCBR,  RCBR,  CIRC,  COLN,  F12, \
-  // |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-       TRNS,   GRV,   DLR,  ASTR,  PMNS,   GT,                        AMPR,  LPRN,  RPRN,  LBRC,  RBRC,  DQUO, \
-  // |------+------+------+------+------+------|-------|    |-------|------+------+------+------+------+------|
-       TRNS,  TRNS,  TRNS,  PERC,  UNDS,   LT,   TRNS,        TRNS,   EXLM,   EQL,    LT,    GT,  QUES, TO(0), \
-  // `-----------------------------------------/-------/    \-------\-----------------------------------------'
-                         TRNS,  TRNS,  TRNS,    TRNS,           TRNS,     TRNS,  TRNS,  TRNS  \
-  //                   `------+------+------''------'          '-------''------+------+------'
-  ),
-
-  [_ARROWS] = LAYOUT_kc( \
-  // .-----------------------------------------.                    .-----------------------------------------.
-      TO(0),  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS, \
-  // |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                       TRNS,  CTLL,   UP,   CTLR,  TRNS,  TRNS, \
-  // |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                       HOME,  LEFT,  DOWN,  RGHT,   END,  TRNS, \
-  // |------+------+------+------+------+------|-------|    |-------|------+------+------+------+------+------|
-       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,        TRNS,   TRNS,   SHL,  TRNS,   SHR,  TRNS, TO(1), \
-  // `-----------------------------------------/-------/    \-------\-----------------------------------------'
-                         TRNS,  TRNS,  TRNS,    TRNS,             TRNS,   TRNS,  PSCR,  APS  \
-  //                   `------+------+------''------'          '-------''------+------+------'
-  ),
-
-  [_NUMPAD] = LAYOUT_kc( \
-  // .-----------------------------------------.                    .-----------------------------------------.
-      TO(0),  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                       TRNS,  TRNS,  PSLS,  PAST,  PMNS,  TRNS, \
-  // |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                       TRNS,    P7,    P8,    P9,  PPLS,  TRNS, \
-  // |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                       TRNS,    P4,    P5,    P6,  PCMM,  TRNS, \
-  // |------+------+------+------+------+------|-------|    |-------|------+------+------+------+------+------|
-       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,        TRNS,   TRNS,    P1,    P2,    P3,   EQL, TO(2), \
-  // `-----------------------------------------/-------/    \-------\-----------------------------------------'
-                         TRNS,  TRNS,  TRNS,    TRNS,             TRNS,     P0,  PDOT,  TRNS  \
-  //                   `------+------+------''------'          '-------''------+------+------'
-  ),
-
-  [_RGB] = LAYOUT_kc( \
-  // .-----------------------------------------.                    .-----------------------------------------.
-      TO(0),  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS, \
-  // |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                        RTG,   RHI,   RHD,  TRNS,  TRNS,  TRNS, \
-  // |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                        RMI,   RSI,   RSD,  TRNS,  TRNS,  TRNS, \
-  // |------+------+------+------+------+------|-------|    |-------|------+------+------+------+------+------|
-       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,        TRNS,    RMD,   RVI,   RVD,  TRNS,  TRNS, TO(3), \
-  // `-----------------------------------------/-------/    \-------\-----------------------------------------'
-                         TRNS,  TRNS,  TRNS,    TRNS,             TRNS,   TRNS,  TRNS,  TRNS  \
-  //                   `------+------+------''------'          '-------''------+------+------'
-  ),
-
-  [_GAMING] = LAYOUT_kc( \
-  // .-----------------------------------------.                    .-----------------------------------------.
-       ESC,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS, \
-  // |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-       TRNS,    Q,    W,     E,     R,     T,                        TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS, \
-  // |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-       TRNS,    A,     S,     D,    F,     G,                        TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS, \
-  // |------+------+------+------+------+------|-------|    |-------|------+------+------+------+------+------|
-       TRNS,  TRNS,  TRNS,  TRNS,   V,     B,   TRNS,        TRNS,   TRNS,  TRNS,  TRNS,  TRNS,  TRNS, TO(4), \
-  // `-----------------------------------------/-------/    \-------\-----------------------------------------'
-                         TRNS,  TRNS,  SPC,    TRNS,             TRNS,   TRNS,  TRNS,  TRNS  \
-  //                   `------+------+------''------'          '-------''------+------+------'
-  ),
-
-  [_TEMPLATE] = LAYOUT_kc( \
-  // .-----------------------------------------.                    .-----------------------------------------.
-      TO(0),  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS, \
-  // |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS, \
-  // |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,                       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS, \
-  // |------+------+------+------+------+------|-------|    |-------|------+------+------+------+------+------|
-       TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS,        TRNS,   TRNS,  TRNS,  TRNS,  TRNS,  TRNS,  TRNS, \
-  // `-----------------------------------------/-------/    \-------\-----------------------------------------'
-                         TRNS,  TRNS,  TRNS,    TRNS,             TRNS,   TRNS,  TRNS,  TRNS  \
-  //                   `------+------+------''------'          '-------''------+------+------'
-  ),
+  [0] = LAYOUT(KC_ESC, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_MINS, KC_TAB, KC_Q, KC_W, KC_E, KC_R, KC_T, KC_Y, KC_U, KC_I, KC_O, KC_P, KC_EQL, KC_LSFT, KC_A, KC_S, KC_D, KC_F, KC_G, KC_H, KC_J, KC_K, KC_L, KC_SCLN, KC_QUOT, KC_LCTL, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_LBRC, KC_RBRC, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_RSFT, KC_LALT, KC_LGUI, MO(0), KC_SPC, KC_ENT, MO(1), KC_RGUI, KC_RALT),
+  [1] = LAYOUT(KC_GRV, KC_TRNS, KC_TRNS, KC_BRID, KC_BRIU, KC_MRWD, KC_MFFD, KC_MPLY, KC_VOLD, KC_VOLU, KC_MUTE, KC_BSPC, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_GRV, KC_EXLM, KC_AT, KC_HASH, KC_DLR, KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_TILD, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_NO, KC_UNDS, KC_PLUS, KC_LCBR, KC_RCBR, KC_PIPE, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
+  [2] = LAYOUT(KC_GRV, KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6, KC_F7, KC_F8, KC_F9, KC_F10, KC_BSPC, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_PGUP, KC_UP, KC_PGDN, KC_MINS, KC_EQL, KC_LSFT, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_NO, KC_LEFT, KC_DOWN, KC_RGHT, KC_SCLN, KC_QUOT, KC_LCTL, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_NO, KC_LCBR, KC_RCBR, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_BSLS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
+  [3] = LAYOUT(KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, RGB_TOG, RGB_HUI, RGB_SAI, RGB_VAI, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, RGB_MOD, RGB_HUD, RGB_SAD, RGB_VAD, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS)
 };
+
 
 int RGB_current_mode;
 const char *read_logo(void);
