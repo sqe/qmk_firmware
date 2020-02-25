@@ -91,7 +91,7 @@ void matrix_scan_user(void) {
    iota_gfx_task();
 }
 
-static int modes;
+static uint8_t modes;
 
 void matrix_render_user(struct CharacterMatrix *matrix) {
   if (modes == 1){
